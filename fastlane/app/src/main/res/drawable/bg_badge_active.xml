@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    In Your Face — Adaptive Interface Overlay System
+    Authors: Sunni (Sir) Morningstar and Cael Devo
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/status_active"/>
+    <corners android:radius="12dp"/>
+</shape>

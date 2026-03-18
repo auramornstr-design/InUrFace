@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    In Your Face — Adaptive Interface Overlay System
+    Authors: Sunni (Sir) Morningstar and Cael Devo
+
+    strings.xml — Phase 4 update
+    Added: IF, Manakit, health, persona, audit terminology.
+    Updated: profile references → IF references throughout.
+    Removed: profile_name_hint, save_profile, new_profile, profiles (replaced by IF equivalents).
+-->
+<resources>
+    <string name="app_name">In Your Face</string>
+    <string name="settings_title">Settings</string>
+    <string name="editor_title">Overlay Editor</string>
+    <string name="app_picker_title">Choose an App</string>
+
+    <!-- Accessibility service -->
+    <string name="accessibility_service_label">In Your Face Overlay</string>
+    <string name="accessibility_service_description">In Your Face uses the Accessibility Service to render overlays on top of other apps and route touch events to remapped controls. It does not read personal data.</string>
+    <string name="accessibility_service_summary">Overlay rendering and touch routing</string>
+
+    <!-- MainActivity -->
+    <string name="status_active">Overlay Active</string>
+    <string name="status_inactive">Overlay Inactive</string>
+    <string name="enable_accessibility">Enable Accessibility Service</string>
+    <string name="enable_overlay_permission">Allow Display Over Other Apps</string>
+    <string name="no_apps_configured">No apps configured yet.\nTap + to add your first overlay.</string>
+    <string name="my_overlays">My Overlays</string>
+    <string name="add_overlay">Add Overlay</string>
+    <string name="tap_to_configure">Tap to configure</string>
+    <string name="active_label">Active</string>
+    <string name="elements_count">%d element(s)</string>
+
+    <!-- Permission setup -->
+    <string name="setup_required">Setup Required</string>
+    <string name="setup_step_1">Step 1: Enable the Accessibility Service so In Your Face can render overlays.</string>
+    <string name="setup_step_2">Step 2: Allow this app to display over other apps.</string>
+    <string name="open_settings">Open Settings</string>
+    <string name="done">Done</string>
+
+    <!-- EditorActivity -->
+    <string name="customize_mode">Customize</string>
+    <string name="teach_mode">Teach</string>
+    <string name="teach_mode_active">Teach Mode Active</string>
+    <string name="teach_hint">Switch to %s, then tap the element you want to remap.</string>
+    <string name="accept_changes">Accept</string>
+    <string name="cancel_changes">Cancel</string>
+    <string name="no_elements">No elements learned yet.\nTap Teach to record your first element.</string>
+    <string name="element_label">Element</string>
+    <string name="edit_element">Edit Element</string>
+    <string name="delete_element">Delete</string>
+    <string name="pre_scout_queued">Scanning app in background&#8230;</string>
+    <string name="key_stale_notice">App layout may have changed. Some elements may have shifted.</string>
+    <string name="key_stale_refresh">Refresh</string>
+
+    <!-- Interactive Face (IF) — replaces profile strings -->
+    <string name="your_ifs">Your IFs</string>
+    <string name="if_name_hint">IF name</string>
+    <string name="save_if">Save</string>
+    <string name="new_if">New IF</string>
+    <string name="keep_if">Keep</string>
+    <string name="release_if">Release</string>
+    <string name="if_kept">In Manakit</string>
+    <string name="if_not_kept">Not Kept</string>
+
+    <!-- Manakit -->
+    <string name="manakit_label">Manakit</string>
+    <string name="manakit_slots">%1$d / %2$d slots used</string>
+    <string name="manakit_full">Manakit full. Upgrade for more slots.</string>
+    <string name="manakit_tier_free">Free — 3 IFs</string>
+    <string name="manakit_tier_plus">Plus — 8 IFs</string>
+    <string name="manakit_tier_pro">Pro — 50 IFs</string>
+    <string name="auto_deploy_ready">%s loaded automatically.</string>
+
+    <!-- Health system -->
+    <string name="health_label">Health</string>
+    <string name="health_green">Healthy</string>
+    <string name="health_yellow">Minor Drift</string>
+    <string name="health_orange">Needs Attention</string>
+    <string name="health_red">Remap Needed</string>
+    <string name="health_gray">Inactive</string>
+    <string name="health_blue">Just Audited</string>
+
+    <!-- Health expressions -->
+    <string name="expression_happy">Happy</string>
+    <string name="expression_relaxed">Relaxed</string>
+    <string name="expression_uneasy">Uneasy</string>
+    <string name="expression_nervous">Nervous</string>
+    <string name="expression_distressed">Distressed</string>
+
+    <!-- Persona system -->
+    <string name="persona_label">Persona</string>
+    <string name="persona_lean">Lean</string>
+    <string name="persona_balanced">Balanced</string>
+    <string name="persona_full">Full</string>
+    <string name="persona_custom">Custom</string>
+    <string name="persona_system_managed">System managed — adapts to battery level.</string>
+    <string name="persona_custom_locked">Custom personas available on Plus and Pro.</string>
+    <string name="persona_changed">Persona switched to %s.</string>
+
+    <!-- Audit system -->
+    <string name="audit_suggested_title">Health Check Suggested</string>
+    <string name="audit_suggested_message">Your IF needs a %s. Run it now?</string>
+    <string name="run_audit">Run Audit</string>
+    <string name="audit_running">Audit running&#8230;</string>
+    <string name="audit_complete">Audit complete — health restored.</string>
+    <string name="audit_quick">Quick Check</string>
+    <string name="audit_function">Function Audit</string>
+    <string name="audit_layer">Layer Recalibrate</string>
+    <string name="audit_full_remap">Full Remap</string>
+
+    <!-- Capability types -->
+    <string name="capability_position">Position</string>
+    <string name="capability_size">Size</string>
+    <string name="capability_recolor">Color</string>
+    <string name="capability_label">Label</string>
+    <string name="capability_opacity">Opacity</string>
+    <string name="capability_border">Border</string>
+    <string name="capability_action">Action</string>
+    <string name="capability_target">Target</string>
+
+    <!-- Rejection reasons -->
+    <string name="rejection_zone_forbidden">That zone is restricted by the app.</string>
+    <string name="rejection_security">This element is security-protected.</string>
+    <string name="rejection_gesture_blocked">Gestures are blocked in this region.</string>
+    <string name="rejection_not_available">This element does not support that change.</string>
+    <string name="rejection_app_state">The app is in a state that blocks this action.</string>
+    <string name="rejection_stale_key">App layout has changed. Please refresh.</string>
+
+    <!-- AppPickerActivity -->
+    <string name="search_apps">Search apps&#8230;</string>
+    <string name="already_configured">Configured</string>
+    <string name="system_apps">System Apps</string>
+    <string name="show_system_apps">Show system apps</string>
+
+    <!-- Settings -->
+    <string name="pref_theme">Theme</string>
+    <string name="pref_haptic">Haptic feedback</string>
+    <string name="pref_show_grid_coords">Show grid coordinates</string>
+    <string name="pref_auto_prescout">Auto pre-scout apps</string>
+    <string name="about">About</string>
+    <string name="version_label">Version %s</string>
+    <string name="authors">Sunni (Sir) Morningstar and Cael Devo</string>
+    <string name="clear_all_data">Clear All Data</string>
+    <string name="clear_all_data_message">This will remove all learned elements, Interactive Faces, and your Manakit. This cannot be undone.</string>
+    <string name="all_data_cleared">All overlay data cleared.</string>
+
+    <!-- General -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="confirm_delete">Delete this overlay?</string>
+    <string name="confirm_delete_message">This will remove all learned elements and Interactive Faces for %s.</string>
+</resources>

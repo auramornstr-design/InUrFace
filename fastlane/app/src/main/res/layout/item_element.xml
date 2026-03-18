@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    In Your Face — Adaptive Interface Overlay System
+    Authors: Sunni (Sir) Morningstar and Cael Devo
+
+    item_element.xml — a learned mapped element in the editor list
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.InYourFace.Card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <!-- Top row: label + grid coords + delete -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Color indicator dot (shows element's recolor value) -->
+            <View
+                android:id="@+id/elementColorDot"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/dot_status"/>
+
+            <TextView
+                android:id="@+id/elementLabel"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:textColor="@color/brand_on_surface"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/elementGridPos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:textColor="@color/brand_on_surface_secondary"
+                android:textSize="12sp"
+                android:fontFamily="monospace"/>
+
+            <ImageView
+                android:id="@+id/btnDeleteElement"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@android:drawable/ic_menu_delete"
+                android:alpha="0.5"
+                android:contentDescription="@string/delete_element"/>
+
+        </LinearLayout>
+
+        <!-- Capability chips row -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/capabilityChips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:chipSpacingVertical="4dp"
+            app:singleLine="false"/>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

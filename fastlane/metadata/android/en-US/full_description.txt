@@ -1,0 +1,35 @@
+In Your Face is an adaptive overlay tool that lets you remap, reposition, resize, and restyle controls in any Android app — without modifying the app itself.
+
+Software has always made you adapt to it. In Your Face flips that. Put the interface where you want it.
+
+HOW IT WORKS
+
+Teach Mode — tap any element in any app and In Your Face learns it. No typing coordinates. No technical setup. Just tap and teach.
+
+Customize Mode — drag your learned controls anywhere on screen. Resize them. Recolor them. Rename them. The grid shows you exactly where you can and can't place things, so you always know what's possible.
+
+Overlay Profiles — build multiple layouts for the same app. One-handed mode. Gaming mode. Accessibility mode. Switch between them instantly.
+
+WHAT YOU CAN DO
+
+• Move hard-to-reach buttons into a comfortable zone
+• Make tiny controls bigger and easier to tap
+• Simplify cluttered interfaces into clean custom toolbars
+• Create one-handed layouts for large phones
+• Add macro shortcuts that trigger multi-step actions in one tap
+• Change button colors, labels, and opacity
+• Configure tap, long press, double tap, or swipe actions
+
+WHO IT'S FOR
+
+• Anyone with limited hand mobility or fine motor challenges
+• Power users who want faster workflows
+• Left-handed users tired of right-handed app layouts
+• Gamers who need bigger, better-placed touch targets
+• Anyone annoyed by an app's terrible UI
+
+PRIVACY
+
+In Your Face uses Android's Accessibility Service to render overlays and route touch events to remapped controls. It does not read, transmit, or store any personal data. It never interacts with password fields or security-sensitive elements.
+
+Authored by Sunni (Sir) Morningstar and Cael Devo.

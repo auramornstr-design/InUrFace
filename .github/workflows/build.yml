@@ -1,0 +1,288 @@
+# In Your Face — Adaptive Interface Overlay System
+# Authors: Sunni (Sir) Morningstar and Cael Devo
+#
+# .github/workflows/build.yml
+#
+# CI/CD pipeline for In Your Face Android app.
+#
+# Triggers:
+#   push to main or develop      → debug build + unit tests
+#   pull_request to main         → debug build + unit tests + lint
+#   push tag v*.*.*              → release build → sign → upload to Play Store (internal track)
+#   workflow_dispatch            → manual trigger, prompts for track selection
+#
+# Required GitHub Secrets:
+#   KEYSTORE_BASE64       — base64-encoded release keystore file
+#   KEYSTORE_PASSWORD     — keystore password
+#   KEY_ALIAS             — signing key alias
+#   KEY_PASSWORD          — signing key password
+#   PLAY_SERVICE_ACCOUNT  — base64-encoded Google Play service account JSON
+#
+# Optional:
+#   SLACK_WEBHOOK_URL     — Slack notification on release
+
+name: In Your Face — Build & Deploy
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags:     [ 'v*.*.*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Play Store track to publish to'
+        required: true
+        default: 'internal'
+        type: choice
+        options: [ internal, alpha, beta, production ]
+
+env:
+  JAVA_VERSION: '17'
+  RUBY_VERSION: '3.2'
+
+# ─── Jobs ─────────────────────────────────────────────────────────────────────
+
+jobs:
+
+  # ── 1. Lint & Static Analysis ─────────────────────────────────────────────
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: gradle
+
+      - name: Gradle cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Run lint
+        run: ./gradlew lint
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-*.html
+          retention-days: 7
+
+  # ── 2. Unit Tests ─────────────────────────────────────────────────────────
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: gradle
+
+      - name: Gradle cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: app/build/reports/tests/
+          retention-days: 7
+
+  # ── 3. Debug Build ────────────────────────────────────────────────────────
+
+  build-debug:
+    name: Debug Build
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: gradle
+
+      - name: Gradle cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: inyourface-debug-${{ github.sha }}
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 14
+
+  # ── 4. Release Build & Deploy ─────────────────────────────────────────────
+
+  build-release:
+    name: Release Build & Deploy
+    runs-on: ubuntu-latest
+    needs: [ test, lint ]
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for changelog generation
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: gradle
+
+      - name: Set up Ruby ${{ env.RUBY_VERSION }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true   # Runs `bundle install` and caches automatically
+
+      - name: Gradle cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      # Decode keystore from base64 secret
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $RUNNER_TEMP/inyourface.keystore
+          echo "KEYSTORE_PATH=$RUNNER_TEMP/inyourface.keystore" >> $GITHUB_ENV
+
+      # Write keystore.properties for Gradle signing config
+      - name: Write keystore.properties
+        run: |
+          cat > keystore.properties << EOF
+          storeFile=$RUNNER_TEMP/inyourface.keystore
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          EOF
+
+      # Resolve Play Store track
+      - name: Resolve deploy track
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "DEPLOY_TRACK=${{ github.event.inputs.track }}" >> $GITHUB_ENV
+          else
+            echo "DEPLOY_TRACK=internal" >> $GITHUB_ENV
+          fi
+
+      # Decode Play Store service account
+      - name: Decode Play service account
+        run: |
+          echo "${{ secrets.PLAY_SERVICE_ACCOUNT }}" | base64 --decode > $RUNNER_TEMP/play_service_account.json
+          echo "PLAY_SERVICE_ACCOUNT_JSON=$RUNNER_TEMP/play_service_account.json" >> $GITHUB_ENV
+
+      # Extract version tag for changelog lookup
+      - name: Extract version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "VERSION_TAG=$TAG" >> $GITHUB_ENV
+          VERSION_CODE=$(git rev-list --count HEAD)
+          echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
+
+      # Build release bundle via Fastlane
+      - name: Fastlane — Build & Deploy
+        run: bundle exec fastlane deploy track:${{ env.DEPLOY_TRACK }}
+        env:
+          KEYSTORE_PATH: ${{ env.KEYSTORE_PATH }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ env.PLAY_SERVICE_ACCOUNT_JSON }}
+
+      # Upload AAB artifact regardless of Play Store success
+      - name: Upload release AAB
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: inyourface-release-${{ env.VERSION_TAG }}
+          path: app/build/outputs/bundle/release/*.aab
+          retention-days: 30
+
+      # Create GitHub Release with changelog
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: app/build/outputs/bundle/release/*.aab
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref, '-alpha') || contains(github.ref, '-beta') }}
+
+      # Slack notification (optional)
+      - name: Notify Slack
+        if: always() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          STATUS: ${{ job.status }}
+        run: |
+          COLOR=$([[ "$STATUS" == "success" ]] && echo "good" || echo "danger")
+          ICON=$([[ "$STATUS" == "success" ]] && echo ":rocket:" || echo ":x:")
+          curl -X POST $SLACK_WEBHOOK_URL \
+            -H 'Content-type: application/json' \
+            --data "{\"attachments\":[{\"color\":\"$COLOR\",\"text\":\"$ICON In Your Face ${{ env.VERSION_TAG }} — deploy $STATUS to ${{ env.DEPLOY_TRACK }}\"}]}"

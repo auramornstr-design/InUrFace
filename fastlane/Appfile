@@ -1,0 +1,14 @@
+# In Your Face — Adaptive Interface Overlay System
+# Authors: Sunni (Sir) Morningstar and Cael Devo
+#
+# fastlane/Appfile
+# App-level configuration shared across all lanes.
+
+# Android package name — must match AndroidManifest.xml
+package_name("com.inyourface.app")
+
+# Google Play service account JSON key path.
+# Override with PLAY_SERVICE_ACCOUNT_JSON env var in CI.
+# For local development, copy your service account JSON to this path
+# and add fastlane/play_service_account.json to .gitignore.
+json_key_file(ENV["PLAY_SERVICE_ACCOUNT_JSON"] || "fastlane/play_service_account.json")

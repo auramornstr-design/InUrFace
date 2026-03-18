@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    In Your Face — Adaptive Interface Overlay System
+    Authors: Sunni (Sir) Morningstar and Cael Devo
+-->
+<resources>
+    <!-- Brand palette — matches the architecture spec document -->
+    <color name="brand_deep">#1A1A2E</color>
+    <color name="brand_mid">#0F3460</color>
+    <color name="brand_accent">#E94560</color>
+    <color name="brand_surface">#16213E</color>
+    <color name="brand_surface_raised">#1E2D50</color>
+    <color name="brand_on_surface">#F5F5F5</color>
+    <color name="brand_on_surface_secondary">#9BA3BF</color>
+    <color name="brand_divider">#2A3A5C</color>
+
+    <!-- Zone colors -->
+    <color name="zone_safe">#3232C850</color>     <!-- Green, 20% alpha -->
+    <color name="zone_forbidden">#50DC323250</color> <!-- Red, 31% alpha -->
+    <color name="zone_caution">#30A0A0A0</color>  <!-- Gray, 19% alpha -->
+    <color name="zone_occupied">#304A90D9</color> <!-- Blue, 19% alpha -->
+
+    <!-- Zone border colors (solid) -->
+    <color name="zone_safe_border">#6432C864</color>
+    <color name="zone_forbidden_border">#80DC3232</color>
+
+    <!-- Status colors -->
+    <color name="status_active">#32C864</color>
+    <color name="status_inactive">#E94560</color>
+    <color name="status_warning">#F5A623</color>
+
+    <!-- Capability type colors — match spec exactly -->
+    <color name="cap_position">#2563A8</color>
+    <color name="cap_size">#1A7A1A</color>
+    <color name="cap_recolor">#E94560</color>
+    <color name="cap_label">#7A5C1E</color>
+    <color name="cap_opacity">#555555</color>
+    <color name="cap_border">#1A7A7A</color>
+    <color name="cap_action">#7A1A7A</color>
+    <color name="cap_target">#0F3460</color>
+
+    <!-- System -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+</resources>

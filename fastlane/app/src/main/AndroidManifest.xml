@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    In Your Face — Adaptive Interface Overlay System
+    Authors: Sunni (Sir) Morningstar and Cael Devo
+
+    AndroidManifest.xml — Phase 4 update
+
+    Permission notes:
+      SYSTEM_ALERT_WINDOW       — Required for TYPE_ACCESSIBILITY_OVERLAY. User grants via
+                                  "Display over other apps" in Settings > Special App Access.
+      FOREGROUND_SERVICE        — RepresentativeRuntime and TopGovernor run as foreground
+                                  services to maintain lifecycle across app switches.
+      FOREGROUND_SERVICE_SPECIAL_USE — Required for specialUse foreground service type.
+      BIND_ACCESSIBILITY_SERVICE — DiplomatRuntime AccessibilityService binding.
+      RECEIVE_BOOT_COMPLETED    — BootReceiver restarts services after device reboot.
+      BATTERY_STATS (normal)    — TopGovernor reads battery level via sticky intent
+                                  (ACTION_BATTERY_CHANGED). No special grant needed.
+
+    We do NOT request INJECT_EVENTS — it is signature-protected and unavailable to
+    Play Store apps. All gesture injection goes through dispatchGesture() on the
+    AccessibilityService, which is the correct legal pathway.
+
+    Service architecture (Phase 4):
+      DiplomatRuntime     — AccessibilityService. Maps interfaces, executes gestures, runs audits.
+      RepresentativeRuntime — Foreground service. UI bridge, Manakit API, queue API.
+      TopGovernor           — Foreground service. Drift monitoring, health, battery persona
+                              degradation, auto-deploy signaling. Standalone supervisor.
+-->
+
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.inyourface.app">
+
+    <!-- ── Permissions ───────────────────────────────────────────────────────── -->
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+    <!--
+        BATTERY_STATS is a normal permission — no user prompt required.
+        TopGovernor reads ACTION_BATTERY_CHANGED via BroadcastReceiver to
+        degrade active personas as battery drops.
+    -->
+    <uses-permission android:name="android.permission.BATTERY_STATS"/>
+
+    <!-- ── Application ───────────────────────────────────────────────────────── -->
+
+    <application
+        android:name=".InYourFaceApp"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@style/Theme.InYourFace"
+        android:allowBackup="true"
+        android:supportsRtl="true">
+
+        <!-- Main launcher activity -->
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <!-- Settings activity (referenced by accessibility service config) -->
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:exported="true"
+            android:label="@string/settings_title"/>
+
+        <!-- Overlay editor activity -->
+        <activity
+            android:name=".ui.EditorActivity"
+            android:exported="false"
+            android:label="@string/editor_title"/>
+
+        <!-- App picker activity -->
+        <activity
+            android:name=".ui.AppPickerActivity"
+            android:exported="false"
+            android:label="@string/app_picker_title"/>
+
+        <!-- ── DiplomatRuntime (AccessibilityService) ──────────────────────── -->
+        <!--
+            The backend mapping and execution intelligence.
+            Declared as an AccessibilityService — this is what grants legal
+            access to dispatchGesture() and TYPE_ACCESSIBILITY_OVERLAY.
+            Phase 4: Also binds to TopGovernor and creates initial IFs on first map.
+            Must have BIND_ACCESSIBILITY_SERVICE permission.
+        -->
+        <service
+            android:name=".diplomat.DiplomatRuntime"
+            android:exported="true"
+            android:label="@string/accessibility_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config"/>
+        </service>
+
+        <!-- ── RepresentativeRuntime (Foreground Service) ─────────────────── -->
+        <!--
+            The user-facing runtime and UI bridge.
+            Runs as a foreground service to maintain lifecycle.
+            Phase 4: Exposes Manakit and MappingQueue APIs. Receives Governor
+            broadcasts and relays them to UI activities.
+            Does NOT interact with foreign apps directly.
+        -->
+        <service
+            android:name=".representative.RepresentativeRuntime"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"/>
+
+        <!-- ── TopGovernor (Foreground Service) ───────────────────────────── -->
+        <!--
+            Standalone supervisor service — Phase 4 addition.
+            Monitors health and drift across all Interactive Faces.
+            Manages battery-driven persona degradation system-wide.
+            Signals auto-deploy when user enters an app with a kept IF.
+            Recommends and coordinates audits when health degrades.
+            Drains the MappingQueue by dispatching jobs to DiplomatRuntime.
+
+            Not exported — only internal components bind to it.
+            foregroundServiceType matches RepresentativeRuntime since both
+            serve the same "display over other apps" use case.
+        -->
+        <service
+            android:name=".governor.TopGovernor"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"/>
+
+        <!-- Boot receiver — restarts all three services after device reboot -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>
