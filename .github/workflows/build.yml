@@ -1,5 +1,5 @@
 
-lname: Build InUrFace
+name: Build InUrFace
 
 on:
   push:
