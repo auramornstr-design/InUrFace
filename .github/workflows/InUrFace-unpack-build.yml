@@ -3,7 +3,7 @@ name: Unpack InUrFace And Build APK
 on:
   push:
     branches:
-      - APP
+      - main
       - master
   pull_request:
   workflow_dispatch:
