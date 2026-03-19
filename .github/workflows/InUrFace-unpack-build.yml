@@ -1,0 +1,64 @@
+name: Unpack InUrFace And Build APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Find and unpack project zip
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ZIP_PATH=""
+          for candidate in \
+            "$GITHUB_WORKSPACE/InUrFace.zip" \
+            "$GITHUB_WORKSPACE/assets/InUrFace.zip" \
+            "$GITHUB_WORKSPACE/vendor/InUrFace.zip"
+          do
+            if [ -f "$candidate" ]; then
+              ZIP_PATH="$candidate"
+              break
+            fi
+          done
+
+          if [ -z "$ZIP_PATH" ]; then
+            echo "Could not find InUrFace.zip in repo root, assets/, or vendor/."
+            exit 1
+          fi
+
+          mkdir -p "$RUNNER_TEMP/inurface-src"
+          unzip -q "$ZIP_PATH" -d "$RUNNER_TEMP/inurface-src"
+          rm -rf "$RUNNER_TEMP/inurface-src/InUrFace/.github"
+          cp -a "$RUNNER_TEMP/inurface-src/InUrFace/." "$GITHUB_WORKSPACE/"
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Build debug APK
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: InUrFace-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
