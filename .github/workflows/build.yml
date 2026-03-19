@@ -17,7 +17,7 @@ jobs:
         run: |
           set -euo pipefail
           ZIP_PATH=""
-          for candidate in "$GITHUB_WORKSPACE/InUrFace.zip" "$GITHUB_WORKSPACE/assets/InUrFace.zip" "$GITHUB_WORKSPACE/vendor/InUrFace.zip"; do
+          for candidate in "$GITHUB_WORKSPACE/InUrFace-fixed-20260319-1333.zip" "$GITHUB_WORKSPACE/assets/InUrFace.zip" "$GITHUB_WORKSPACE/vendor/InUrFace.zip"; do
             if [ -f "$candidate" ]; then
               ZIP_PATH="$candidate"
               break
